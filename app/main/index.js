@@ -7,4 +7,6 @@ app.on("ready", () => {
   // createMainWindow();
   createControlWindow();
   handleIpc();
+  require("./robot")();
 });
+app.allowRendererProcessReuse = false;
