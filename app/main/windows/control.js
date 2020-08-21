@@ -14,6 +14,8 @@ const create = () => {
   win.loadFile(
     path.resolve(__dirname, "../../renderer/pages/control/index.html")
   );
+
+  win.webContents.openDevTools();
 };
 
 function send(channel, ...args) {
