@@ -44,4 +44,23 @@ async function createAnswer(offer) {
   return pc.localDescription;
 }
 
+pc.onicecandidate = (e) => {
+  console.log("onicecandidate", JSON.stringify(e.candidate));
+};
+
+const candidates = [];
+async function addIceCandidate(candidate) {
+  if (candidate) {
+    candidates.push(candidate);
+  }
+
+  if (pc.remoteDescription && pc.remoteDescription.type) {
+    for (let i = 0; i < candidates.length; i++) {
+      await pc.addIceCandidate(new RTCIceCandidate(candidates[i]));
+    }
+  }
+}
+
+window.addIceCandidate = addIceCandidate;
+
 window.createAnswer = createAnswer;

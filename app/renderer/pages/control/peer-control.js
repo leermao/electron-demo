@@ -63,4 +63,24 @@ pc.onaddstream = function (e) {
   peer.emit("add-steam", e.stream);
 };
 
+//p2p NAT穿透
+pc.onicecandidate = (e) => {
+  console.log("onicecandidate", JSON.stringify(e.candidate));
+};
+
+const candidates = [];
+async function addIceCandidate(candidate) {
+  if (candidate) {
+    candidates.push(candidate);
+  }
+
+  if (pc.remoteDescription && pc.remoteDescription.type) {
+    for (let i = 0; i < candidates.length; i++) {
+      await pc.addIceCandidate(new RTCIceCandidate(candidates[i]));
+    }
+  }
+}
+
+window.addIceCandidate = addIceCandidate;
+
 module.exports = peer;
