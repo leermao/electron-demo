@@ -1,4 +1,4 @@
-const { BrowserWindow } = require("electron");
+const { BrowserWindow, globalShortcut } = require("electron");
 const isDev = require("electron-is-dev");
 const path = require("path");
 
@@ -17,6 +17,10 @@ const create = () => {
   } else {
     win.loadFile(path.resolve(__dirname, "../renderer/pages/main/index.html"));
   }
+
+  globalShortcut.register("CommandOrControl+Shift+i", () => {
+    win.webContents.openDevTools();
+  });
 };
 
 function send(channel, ...args) {

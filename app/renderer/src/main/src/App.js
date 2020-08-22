@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 // import { ipcRenderer } from "electron";
 import "./App.css";
+import "./peer-puppet.js";
 const { ipcRenderer } = window.require("electron");
 
 function App() {
@@ -42,7 +43,7 @@ function App() {
   return (
     <div className="App">
       {controlText === "" ? (
-        <frameElement>
+        <Fragment>
           <div> 你的控制码 {localCode}</div>
           <input
             type="text"
@@ -56,7 +57,7 @@ function App() {
           >
             确认
           </button>
-        </frameElement>
+        </Fragment>
       ) : (
         <div>{controlText}</div>
       )}
