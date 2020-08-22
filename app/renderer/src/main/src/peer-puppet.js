@@ -1,4 +1,4 @@
-const { desktopCapturer } = window.require("electron");
+const { desktopCapturer, ipcRenderer } = window.require("electron");
 // createAnswer
 // addStream
 
@@ -46,6 +46,10 @@ async function createAnswer(offer) {
 
 pc.onicecandidate = (e) => {
   console.log("onicecandidate", JSON.stringify(e.candidate));
+
+  if (e.candidate) {
+    ipcRenderer.send("forward", "puppent-candidate", e.candidate);
+  }
 };
 
 const candidates = [];
@@ -62,5 +66,11 @@ async function addIceCandidate(candidate) {
 }
 
 window.addIceCandidate = addIceCandidate;
+
+ipcRenderer.on("offer", async (e, offer) => {
+  let awswer = await createAnswer(offer);
+
+  ipcRenderer.send("forward", "awswer", { type: awswer.type, sdp: awswer.sdp });
+});
 
 window.createAnswer = createAnswer;

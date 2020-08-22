@@ -1,6 +1,6 @@
 const EventEmitter = require("events");
 const peer = new EventEmitter();
-// const { desktopCapturer, ipcRenderer } = require("electron");
+const { ipcRenderer } = require("electron");
 
 // const getScreenStream = async () => {
 //   const scoure = await desktopCapturer.getSources({
@@ -36,7 +36,7 @@ const peer = new EventEmitter();
 // });
 
 const pc = new window.RTCPeerConnection();
-async function CreateOffer() {
+async function createOffer() {
   // offer的SDP
   const offer = await pc.createOffer({
     offerToReceiveAudio: false,
@@ -50,11 +50,18 @@ async function CreateOffer() {
   // 返回localDescription
   return pc.localDescription;
 }
-CreateOffer();
+
+createOffer().then((offer) => {
+  ipcRenderer.send("forward", "offer", { type: offer.type, sdp: offer.sdp });
+});
 
 async function setRemote(ans) {
   await pc.setRemoteDescription(ans);
 }
+
+ipcRenderer.on("answer", (e, data) => {
+  setRemote(data);
+});
 
 window.setRemote = setRemote;
 
@@ -66,7 +73,15 @@ pc.onaddstream = function (e) {
 //p2p NAT穿透
 pc.onicecandidate = (e) => {
   console.log("onicecandidate", JSON.stringify(e.candidate));
+
+  if (e.candidate) {
+    ipcRenderer.send("forward", "control-candidate", e.candidate);
+  }
 };
+
+ipcRenderer.on("candidate", (e, condadite) => {
+  addIceCandidate(condadite);
+});
 
 const candidates = [];
 async function addIceCandidate(candidate) {
