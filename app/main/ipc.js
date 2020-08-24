@@ -14,7 +14,9 @@ module.exports = () => {
   });
 
   ipcMain.on("control", (e, remote) => {
-    signal.send("control", { remote });
+    createControlWindow();
+    sendMainWindow("control-state-change", remote, 1);
+    // signal.send("control", { remote });
   });
 
   signal.on("controlled", (data) => {
@@ -27,7 +29,8 @@ module.exports = () => {
   });
 
   ipcMain.on("forward", (e, event, data) => {
-    signal.send("forward", { event, data });
+    console.log("信令服务转发", event);
+    // signal.send("forward", { event, data });
   });
 
   signal.on("offer", (data) => {

@@ -34,7 +34,6 @@ wss.on("connection", (ws, req) => {
       if (code2ws.has(remote)) {
         ws.sendData("controlled", { remote });
         ws.sendRemote = code2ws.get(remote).sendData;
-
         ws.sendRemote("be-controlled", { remote: code });
       }
     } else if (event === "forward") {

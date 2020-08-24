@@ -1,6 +1,6 @@
 const { desktopCapturer, ipcRenderer } = window.require("electron");
-// createAnswer
-// addStream
+// // createAnswer
+// // addStream
 
 const getScreenStream = async () => {
   const scoure = await desktopCapturer.getSources({
@@ -45,14 +45,14 @@ async function createAnswer(offer) {
 }
 
 pc.onicecandidate = (e) => {
-  console.log("onicecandidate", JSON.stringify(e.candidate));
+  console.log("candidate", JSON.stringify(e.candidate));
 
-  if (e.candidate) {
-    ipcRenderer.send("forward", "puppent-candidate", e.candidate);
-  }
+  // if (e.candidate) {
+  //   ipcRenderer.send("forward", "puppent-candidate", e.candidate);
+  // }
 };
 
-const candidates = [];
+let candidates = [];
 async function addIceCandidate(candidate) {
   if (candidate) {
     candidates.push(candidate);
@@ -62,15 +62,16 @@ async function addIceCandidate(candidate) {
     for (let i = 0; i < candidates.length; i++) {
       await pc.addIceCandidate(new RTCIceCandidate(candidates[i]));
     }
+    candidates = [];
   }
 }
 
-window.addIceCandidate = addIceCandidate;
-
-ipcRenderer.on("offer", async (e, offer) => {
-  let awswer = await createAnswer(offer);
-
-  ipcRenderer.send("forward", "awswer", { type: awswer.type, sdp: awswer.sdp });
-});
+// ipcRenderer.on("offer", async (e, offer) => {
+//   console.log("B端收到offer");
+//   let awswer = await createAnswer(offer);
+//   console.log("B端发出awswer");
+//   ipcRenderer.send("forward", "awswer", { type: awswer.type, sdp: awswer.sdp });
+// });
 
 window.createAnswer = createAnswer;
+window.addIceCandidate = addIceCandidate;
