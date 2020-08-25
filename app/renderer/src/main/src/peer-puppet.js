@@ -58,7 +58,11 @@ pc.onicecandidate = (e) => {
   console.log("candidate", JSON.stringify(e.candidate));
 
   if (e.candidate) {
-    ipcRenderer.send("forward", "puppet-candidate", e.candidate);
+    ipcRenderer.send(
+      "forward",
+      "puppet-candidate",
+      JSON.stringify(e.candidate)
+    );
   }
 };
 
@@ -70,7 +74,7 @@ ipcRenderer.on("candidate", (e, condadite) => {
 let candidates = [];
 async function addIceCandidate(candidate) {
   if (candidate) {
-    candidates.push(candidate);
+    candidates.push(JSON.parse(candidate));
   }
 
   if (pc.remoteDescription && pc.remoteDescription.type) {
