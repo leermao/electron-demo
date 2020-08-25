@@ -7,6 +7,17 @@ const { ipcRenderer } = require("electron");
 // });
 
 const pc = new window.RTCPeerConnection();
+const dc = pc.createDataChannel("robotchannel", { reliable: false });
+dc.onopen = () => {
+  peer.on("robot", (type, data) => {
+    // ipcRenderer.send("robot", type, data);
+    dc.send(JSON.stringify({ type, data }));
+  });
+};
+dc.onmessage = (e) => {
+  console.log("message", e);
+};
+
 async function createOffer() {
   // offer的SDP
   const offer = await pc.createOffer({
@@ -22,21 +33,24 @@ async function createOffer() {
   return pc.localDescription;
 }
 
-createOffer();
+// createOffer();
 
-// createOffer().then((offer) => {
-//   console.log("A端发送offer");
-//   // ipcRenderer.send("forward", "offer", { type: offer.type, sdp: offer.sdp });
-// });
+/**
+ * 获取offer
+ */
+createOffer().then((offer) => {
+  console.log("A端发送offer");
+  ipcRenderer.send("forward", "offer", { type: offer.type, sdp: offer.sdp });
+});
 
 async function setRemote(answer) {
   await pc.setRemoteDescription(answer);
 }
 
-// ipcRenderer.on("answer", (e, answer) => {
-//   console.log("A端收到awswer");
-//   setRemote(answer);
-// });
+ipcRenderer.on("answer", (e, answer) => {
+  console.log("A端收到awswer");
+  setRemote(answer);
+});
 
 pc.onaddstream = function (e) {
   console.log("add-stream", e.stream);
@@ -47,15 +61,15 @@ pc.onaddstream = function (e) {
 pc.onicecandidate = (e) => {
   console.log("onicecandidate", JSON.stringify(e.candidate));
 
-  // if (e.candidate) {
-  //   ipcRenderer.send("forward", "control-candidate", e.candidate);
-  // }
+  if (e.candidate) {
+    ipcRenderer.send("forward", "control-candidate", e.candidate);
+  }
 };
 
-// ipcRenderer.on("candidate", (e, condadite) => {
-
-//   // addIceCandidate(condadite);
-// });
+ipcRenderer.on("candidate", (e, condadite) => {
+  console.log("收到傀儡端的candidate");
+  addIceCandidate(condadite);
+});
 
 let candidates = [];
 async function addIceCandidate(candidate) {

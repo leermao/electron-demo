@@ -24,6 +24,7 @@ function App() {
     }
 
     setControlText(text);
+    document.title = text;
   };
 
   useEffect(() => {
