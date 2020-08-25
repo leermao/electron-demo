@@ -33,6 +33,7 @@ const getScreenStream = async () => {
 };
 
 const pc = new window.RTCPeerConnection();
+
 pc.ondatachannel = (e) => {
   console.log("datachannel", e);
 
@@ -61,6 +62,11 @@ pc.onicecandidate = (e) => {
   }
 };
 
+ipcRenderer.on("candidate", (e, condadite) => {
+  console.log("收到控制端的candidate");
+  addIceCandidate(condadite);
+});
+
 let candidates = [];
 async function addIceCandidate(candidate) {
   if (candidate) {
@@ -84,6 +90,3 @@ ipcRenderer.on("offer", async (e, offer) => {
   console.log("B端发出awswer");
   ipcRenderer.send("forward", "answer", { type: answer.type, sdp: answer.sdp });
 });
-
-window.createAnswer = createAnswer;
-window.addIceCandidate = addIceCandidate;

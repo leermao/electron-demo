@@ -85,7 +85,4 @@ async function addIceCandidate(candidate) {
   }
 }
 
-window.addIceCandidate = addIceCandidate;
-window.setRemote = setRemote;
-
 module.exports = peer;
